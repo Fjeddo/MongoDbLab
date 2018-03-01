@@ -23,8 +23,18 @@ namespace MongoLab
 
         public void AddToCollection<T>(T item)
         {
-            var collection = _db.GetCollection<T>(typeof(T).FullName);
+            AddToCollection(item, typeof(T).FullName);
+        }
+
+        public void AddToCollection<T>(T item, string collectionName)
+        {
+            var collection = _db.GetCollection<T>(collectionName);
             collection.InsertOne(item);
+        }
+
+        public List<dynamic> GetAll(string collectionName)
+        {
+            return _db.GetCollection<dynamic>(collectionName).AsQueryable().ToList();
         }
 
         public List<T> GetAll<T>()
@@ -34,7 +44,12 @@ namespace MongoLab
 
         public T Get<T>(Expression<Func<T,bool>> filter)
         {
-            return _db.GetCollection<T>(typeof(T).FullName).FindSync(filter).FirstOrDefault();
+            return Get(filter, typeof(T).FullName);
+        }
+
+        public T Get<T>(Expression<Func<T, bool>> filter, string collectionName)
+        {
+            return _db.GetCollection<T>(collectionName).FindSync(filter).FirstOrDefault();
         }
     }
 }
